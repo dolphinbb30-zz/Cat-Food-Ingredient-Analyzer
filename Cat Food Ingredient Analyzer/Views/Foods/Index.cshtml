@@ -1,0 +1,266 @@
+﻿@using Cat_Food_Ingredient_Analyzer.Models;
+@model IEnumerable<Food>
+
+@{
+    ViewBag.Title = "List";
+}
+<hr />
+
+<p>
+    @Html.ActionLink("Create New", "index", "home")
+</p>
+<div class="form-horizontal">
+    <div class="form-group">
+        <label class="control-label col-md-2" for="Search">Search</label>
+        <div class="col-md-10">
+            <input class="form-control text-box single-line valid" id="Search" name="Search" type="text" aria-invalid="false">
+            <span class="field-validation-valid text-danger" data-valmsg-for="Search" data-valmsg-replace="true"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2" for="UnitOfMass">Unit of Mass</label>
+        <div class="col-md-4">
+            @Html.DropDownList("UnitOfMass", new SelectList(from UnitOfMass d in Enum.GetValues(typeof(UnitOfMass)) select new { ID = (int)d, Name = d.ToString() }, "ID", "Name", UnitOfMass.Kilogram), htmlAttributes: new { @class = "form-control" })
+            <span class="field-validation-valid text-danger" data-valmsg-for="UnitOfMass" data-valmsg-replace="true"></span>
+        </div>
+        <label class="control-label col-md-2" for="CurrencyOfPrice">Currency of Price</label>
+        <div class="col-md-4">
+            @Html.DropDownList("CurrencyOfPrice", (IEnumerable<SelectListItem>)ViewBag.CurrencyOrderByFrequencies, htmlAttributes: new { @class = "form-control" })
+            <span class="field-validation-valid text-danger" data-valmsg-for="CurrencyOfPrice" data-valmsg-replace="true"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Columns</label>
+        <label class="control-label col-md-2">
+            <input name="checkBrandName" type="checkbox" checked />
+            Brand Name
+        </label>
+        <label class="control-label col-md-2">
+            <input name="checkFoodName" type="checkbox" checked />
+            Food Name
+        </label>
+        <label class="control-label col-md-2">
+            <input name="checkMass" type="checkbox" checked />
+            Mass
+        </label>
+        <label class="control-label col-md-2">
+            <input name="checkPrice" type="checkbox" checked />
+            Price
+        </label>
+        <label class="control-label col-md-2">
+            <input name="checkIngredients" type="checkbox" />
+            Ingredients
+        </label>
+    </div>
+</div>
+<hr />
+
+<h2>List</h2>
+<table class="table" id="myTable2">
+    <thead style="background-color:white;">
+        <tr>
+            <th onclick="sortTable(0)" class="cursorPointer checkBrandName">
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Brand.BrandName)
+            </th>
+            <th class="checkFoodName">
+                @Html.DisplayNameFor(model => model.FirstOrDefault().FoodName)
+            </th>
+            <th onclick="sortTable(2)" class="cursorPointer checkMass">
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Mass) (@((UnitOfMass)Model.FirstOrDefault().UnitOfMass))
+            </th>
+            <th onclick="sortTable(3)" class="cursorPointer checkPrice">
+                @Html.DisplayNameFor(model => model.Where(H => H.Price.HasValue).FirstOrDefault().Price) (@Model.FirstOrDefault().CurrencyOfPrice)
+            </th>
+            @*<th>
+                    @Html.DisplayNameFor(model => model.ForLifeStage)
+                </th>*@
+            <th class="checkIngredients">
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Ingredients)
+            </th>
+            <th onclick="sortTable(5)" class="cursorPointer">
+                Price/@((UnitOfMass)Model.FirstOrDefault(m => m.UnitOfMass.HasValue).UnitOfMass)
+            </th>
+            <th onclick="sortTable(6)" class="cursorPointer">
+                Score
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+
+    @foreach (var item in Model)
+    {
+        <tr class="cursorPointer">
+            <td class="BrandName checkBrandName" onclick="window.open('/home/index/@item.Id','_blank')">
+                @Html.DisplayFor(modelItem => item.Brand.BrandName)
+            </td>
+            <td class="FoodName checkFoodName" onclick="window.open('/home/index/@item.Id','_blank')">
+                @Html.DisplayFor(modelItem => item.FoodName)
+            </td>
+            <td class="Mass checkMass" onclick="window.open('/home/index/@item.Id','_blank')">
+                @if (item.Mass.HasValue)
+                {
+                    @item.Mass
+                }
+            </td>
+            <td class="Price checkPrice" onclick="window.open('/home/index/@item.Id','_blank')">
+                @if (item.Price.HasValue)
+                {
+                    @item.Price
+                }
+            </td>
+            @*<td>
+                    @Html.DisplayFor(modelItem => item.ForLifeStage)
+                </td>*@
+            <td class="Ingredients checkIngredients" onclick="window.open('/home/index/@item.Id','_blank')">
+                @Html.DisplayFor(modelItem => item.Ingredients)
+            </td>
+            <td class="PricePerMass" onclick="window.open('/home/index/@item.Id','_blank')">
+                @if (item.Price.HasValue)
+                {
+                    @((item.Price / item.Mass).Value.ToString("N2") + " ")
+                }
+            </td>
+            <td class="" onclick="window.open('/home/index/@item.Id','_blank')">
+                @item.Ingredients.ScoreAnalyze()
+            </td>
+            <td>
+                @Html.ActionLink("Analyze", "index", "home", new { id = item.Id }, null)<br />
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id })<br />
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
+
+</table>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $("#Search").on("input", function () {
+            var s = $("#Search").val().trim();
+            $(".BrandName").each(function (index) {
+                var text = this.textContent;
+                var regex = new RegExp('(' + s + ')', 'ig');
+                text = text.replace(regex, '<span class="highlight">$1</span>');
+                this.innerHTML = text;
+            });
+            $(".FoodName").each(function (index) {
+                var text = this.textContent;
+                var regex = new RegExp('(' + s + ')', 'ig');
+                text = text.replace(regex, '<span class="highlight">$1</span>');
+                this.innerHTML = text;
+            });
+            $(".Ingredients").each(function (index) {
+                var text = this.textContent;
+                var regex = new RegExp('(' + s + ')', 'ig');
+                text = text.replace(regex, '<span class="highlight">$1</span>');
+                this.innerHTML = text;
+            });
+            $(".PricePerMass").each(function (index) {
+                var text = this.textContent;
+                var regex = new RegExp('(' + s + ')', 'ig');
+                text = text.replace(regex, '<span class="highlight">$1</span>');
+                this.innerHTML = text;
+            });
+        });
+
+        $("#UnitOfMass").on("change", function () {
+            window.location.replace("/Foods/index?unitOfMass=" + $("#UnitOfMass").val() + "&currencyOfPrice=" + $("#CurrencyOfPrice").val());
+        });
+
+        $("#CurrencyOfPrice").on("change", function () {
+            window.location.replace("/Foods/index?unitOfMass=" + $("#UnitOfMass").val() + "&currencyOfPrice=" + $("#CurrencyOfPrice").val());
+        });
+
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("myTable2");
+            switching = true;
+            // Set the sorting direction to ascending:
+            dir = "asc";
+            /* Make a loop that will continue until
+            no switching has been done: */
+            while (switching) {
+                // Start by saying: no switching is done:
+                switching = false;
+                rows = table.getElementsByTagName("TR");
+                /* Loop through all table rows (except the
+                first, which contains table headers): */
+                for (i = 1; i < (rows.length - 1); i++) {
+                    // Start by saying there should be no switching:
+                    shouldSwitch = false;
+                    /* Get the two elements you want to compare,
+                    one from current row and one from the next: */
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    /* Check if the two rows should switch place,
+                    based on the direction, asc or desc: */
+                    if (dir == "asc") {
+                        //if number
+                        if ($.isNumeric(x.innerHTML) && $.isNumeric(y.innerHTML)) {
+                            if (parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) {
+                                // If so, mark as a switch and break the loop:
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                        //if not number
+                        else if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            // If so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        //if number
+                        if ($.isNumeric(x.innerHTML) && $.isNumeric(y.innerHTML)) {
+                            if (parseFloat(x.innerHTML) < parseFloat(y.innerHTML)) {
+                                // If so, mark as a switch and break the loop:
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                        //if not number
+                        else if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            // If so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    /* If a switch has been marked, make the switch
+                    and mark that a switch has been done: */
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    // Each time a switch is done, increase this count by 1:
+                    switchcount++;
+                } else {
+                    /* If no switching has been done AND the direction is "asc",
+                    set the direction to "desc" and run the while loop again. */
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+
+        $("input:checkbox:not(:checked)").each(function () {
+            var column = "table ." + $(this).attr("name");
+            $(column).hide();
+        });
+
+        $("input:checkbox").click(function () {
+            var column = "table ." + $(this).attr("name");
+            $(column).toggle();
+        });
+
+        $(document).ready(function () {
+            var $table = $('table#myTable2');
+
+            $table.floatThead({
+                top: 51
+            });
+        });
+    </script>
+}

@@ -24,7 +24,7 @@ textarea {
 }
 
 textarea {
-    min-height: 160px;
+    min-height: 320px;
     max-width: 945px;
 }
 
@@ -34,4 +34,50 @@ textarea {
 
 .green {
     background-color: rgba(0,255,0,0.5);
+}
+
+fontSize14px {
+    font-size: 14px !important;
+}
+
+fontSize0 {
+    font-size: 0;
+}
+
+a .colorGray {
+    color: gray;
+    text-decoration: underline;
+}
+
+a.colorBlack {
+    color: black !important;
+    text-decoration: underline;
+}
+
+.highlight {
+    background-color: yellow;
+}
+
+.cursorPointer {
+    cursor: pointer;
+}
+
+.isabelline {
+    background-color: #F9E9F0 !important;
+}
+
+.mistyRose {
+    background-color: #FFE7E7 !important;
+}
+
+.whiteSmoke {
+    background-color: #E9F6F6 !important;
+}
+
+.nyanza {
+    background-color: #E7FFE7 !important;
+}
+
+tr:hover {
+    background-color: #F9F9F8 !important;
 }

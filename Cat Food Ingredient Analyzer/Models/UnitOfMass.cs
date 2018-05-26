@@ -1,4 +1,6 @@
-﻿namespace Cat_Food_Ingredient_Analyzer.Models
+﻿using System;
+
+namespace Cat_Food_Ingredient_Analyzer.Models
 {
     public enum UnitOfMass
     {

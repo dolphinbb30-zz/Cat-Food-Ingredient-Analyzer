@@ -7,26 +7,27 @@ namespace Cat_Food_Ingredient_Analyzer.Models
     {
         public string Brand { get; set; }
 
-        public string Name { get; set; }
+        [DisplayName("Food Name")]
+        public string FoodName { get; set; }
 
         [DisplayName("For Life Stage")]
-        public LifeStage ForLifeStage { get; set; }
+        public LifeStage? ForLifeStage { get; set; }
+
+        [Required]
+        public string Ingredients { get; set; }
 
         public decimal? Mass { get; set; }
 
         [DisplayName("Unit of Mass")]
         [Required]
-        public UnitOfMass UnitOfMass { get; set; }
+        public UnitOfMass? UnitOfMass { get; set; }
 
         public decimal? Price { get; set; }
 
         [DisplayName("Currency of Price")]
         public string CurrencyOfPrice { get; set; }
 
-        [Required]
-        public string Ingredients { get; set; }
-
-        public decimal GetMassInUnit(UnitOfMass UnitOfMass)
+        public decimal? GetMassInUnit(UnitOfMass UnitOfMass)
         {
             if (Mass.HasValue)
             {
@@ -45,7 +46,7 @@ namespace Cat_Food_Ingredient_Analyzer.Models
             }
             else
             {
-                return 0;
+                return null;
             }
         }
     }

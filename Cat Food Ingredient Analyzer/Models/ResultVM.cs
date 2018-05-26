@@ -6,6 +6,6 @@ namespace Cat_Food_Ingredient_Analyzer.Models
     {
         public FoodVM Food { get; set; }
 
-        public Dictionary<string, decimal> IngredientScore { get; set; }
+        public List<Info> Infos { get; set; }
     }
 }
